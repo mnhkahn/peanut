@@ -42,7 +42,7 @@ func (index *Index) AddDocument(doc *Document) error {
 	// ========== Lock =============
 	index.documentLock.Lock()
 	docId, err := index.createCurIdIfNotExists(doc.PK)
-	logger.Warnf("add document doc: %d, %v", docId, doc.PK)
+	logger.Infof("add document doc: %d, %v", docId, doc.PK)
 	if err != nil {
 		index.documentLock.Unlock()
 		return err
