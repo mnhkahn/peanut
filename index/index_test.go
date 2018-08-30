@@ -240,3 +240,30 @@ func TestIndex_PageSize(t *testing.T) {
 	assert.Equal(t, 3, cnt)
 	assert.Equal(t, 1, len(res))
 }
+
+func TestAddTwoTimes(t *testing.T) {
+	index, err := NewIndex("/tmp/a.db")
+	defer index.Close()
+	assert.Nil(t, err)
+
+	err = index.ClearAll()
+	assert.Nil(t, err)
+
+	err = index.AddDocument(&Document{
+		PK:    "http://blog.cyeam.com/json/2014/08/04/go_json",
+		Title: "Golang——json数据处理",
+	})
+	assert.Nil(t, err)
+	err = index.AddDocument(&Document{
+		PK:    "http://blog.cyeam.com/json/2014/08/04/go_json",
+		Title: "Golang——json数据处理",
+	})
+	assert.Nil(t, err)
+
+	cnt, res, err := index.Search(&Param{
+		Query: "golang",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(res))
+	assert.Equal(t, 1, cnt)
+}
