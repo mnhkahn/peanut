@@ -2,7 +2,6 @@ package index
 
 import (
 	"encoding/binary"
-	"go/build"
 	"sync"
 
 	"github.com/boltdb/bolt"
@@ -88,7 +87,7 @@ func NewIndex(path string) (*Index, error) {
 		return index, err
 	}
 
-	index.segmenter.LoadDictionary(build.Default.GOPATH + "/src/github.com/huichen/sego/data/dictionary.txt")
+	index.segmenter.LoadDictionary("./dictionary.txt")
 
 	return index, err
 }
