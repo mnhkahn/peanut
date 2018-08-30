@@ -22,4 +22,5 @@ type Document struct {
 	Tags     []string `json:"tags"`
 	Category string   `json:"category"`
 	Link     string   `json:"link"`
+	Figure   string   `json:"figure"`
 }
