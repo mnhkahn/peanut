@@ -48,6 +48,7 @@ func (index *Index) SearchDocIds(param *Param) (int, []uint32, error) {
 		if err != nil {
 			return 0, nil, err
 		}
+
 		mergeIds = append(mergeIds, keyWordIds)
 	}
 
@@ -74,6 +75,7 @@ func (index *Index) SearchDocIds(param *Param) (int, []uint32, error) {
 	res = index.SortDocIds(param, res)
 	// page & size
 	res = index.PageSizeDocIds(res, param.Offset, param.Size)
+
 	return total, res, nil
 }
 
@@ -117,34 +119,34 @@ func (index *Index) SearchKeyWords(queries []string) ([]uint32, error) {
 		return nil, nil
 	}
 
-	res := make([]uint32, 0, len(queries))
+	res := make([][]uint32, 0, len(queries))
 	for _, query := range queries {
 		// search in title
 		docIds, exists, err := index.title.SearchBytesUints([]byte(query))
 		if err != nil {
-			return res, err
+			return nil, err
 		} else if exists {
-			res = append(res, docIds...)
+			res = append(res, docIds)
 		}
 
 		// search in brief
 		docIds, exists, err = index.brief.SearchBytesUints([]byte(query))
 		if err != nil {
-			return res, err
+			return nil, err
 		} else if exists {
-			res = append(res, docIds...)
+			res = append(res, docIds)
 		}
 
 		// search in full text
 		docIds, exists, err = index.fullText.SearchBytesUints([]byte(query))
 		if err != nil {
-			return res, err
+			return nil, err
 		} else if exists {
-			res = append(res, docIds...)
+			res = append(res, docIds)
 		}
 	}
 
-	return res, nil
+	return xsort.MergeOrUints(res...), nil
 }
 
 // SearchTag ...
