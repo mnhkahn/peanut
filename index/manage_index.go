@@ -12,6 +12,13 @@ import (
 )
 
 func (index *Index) createCurIdIfNotExists(pk string) (uint32, error) {
+	docIds, err := index.SearchPks(pk)
+	if err != nil {
+		return 0, err
+	} else if len(docIds) == 1 {
+		logger.Infof("reuse docId: %d, pk: %s", docIds[0], pk)
+		return docIds[0], nil
+	}
 	return index.getCurId(), nil
 }
 
@@ -35,7 +42,7 @@ func (index *Index) AddDocument(doc *Document) error {
 	// ========== Lock =============
 	index.documentLock.Lock()
 	docId, err := index.createCurIdIfNotExists(doc.PK)
-	logger.Debugf("add document doc: %d, %v, %v", docId, doc, err)
+	logger.Warnf("add document doc: %d, %v", docId, doc.PK)
 	if err != nil {
 		index.documentLock.Unlock()
 		return err
@@ -63,7 +70,6 @@ func (index *Index) AddDocument(doc *Document) error {
 
 	// add title index
 	for _, t := range sego.SegmentsToSlice(index.segmenter.Segment([]byte(doc.Title)), false) {
-		logger.Infof("sego %s %s", t, doc.Title)
 		index.title.AppendBytesUints([]byte(t), docId)
 	}
 
