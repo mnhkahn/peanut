@@ -2,6 +2,12 @@
 ## [Unreleased]
 
 
+<a name="v1.0.1"></a>
+## [v1.0.1] - 2018-08-30
+### Fix
+- **segmenter:** fix dictionary.txt path
+
+
 <a name="v1.0.0"></a>
 ## v1.0.0 - 2018-08-30
 ### Feat
@@ -16,4 +22,5 @@
 - **debug:** rm debug log.
 
 
-[Unreleased]: https://github.com/mnhkahn/peanut/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/mnhkahn/peanut/compare/v1.0.1...HEAD
+[v1.0.1]: https://github.com/mnhkahn/peanut/compare/v1.0.0...v1.0.1
