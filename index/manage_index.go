@@ -68,17 +68,14 @@ func (index *Index) AddDocument(doc *Document) error {
 	}
 
 	for _, t := range sego.SegmentsToSlice(index.segmenter.Segment([]byte(doc.Brief)), false) {
-		logger.Infof("sego %s %s", t, doc.Brief)
 		index.brief.AppendBytesUints([]byte(t), docId)
 	}
 
 	for _, t := range sego.SegmentsToSlice(index.segmenter.Segment([]byte(doc.FullText)), false) {
-		logger.Infof("sego %s %s", t, doc.FullText)
 		index.fullText.AppendBytesUints([]byte(t), docId)
 	}
 
 	for _, tag := range doc.Tags {
-		logger.Infof("tag %s %s", tag, doc.FullText)
 		index.tag.AppendBytesUints(util.StrToLowerBytes(tag), docId)
 	}
 
