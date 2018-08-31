@@ -4,16 +4,17 @@ import (
 	"fmt"
 
 	"github.com/huichen/sego"
-
-	"github.com/vmihailenco/msgpack"
-
-	"github.com/mnhkahn/gogogo/logger"
-
 	"github.com/mnhkahn/gods/xsort"
+	"github.com/mnhkahn/gogogo/logger"
+	"github.com/vmihailenco/msgpack"
 )
 
 // Search ...
 func (index *Index) Search(pars *Param) (int, []*Document, error) {
+	if pars.Query == "*" {
+		return index.SearchAll(pars)
+	}
+
 	total, docIds, err := index.SearchDocIds(pars)
 	if err != nil {
 		return 0, nil, err
@@ -21,6 +22,19 @@ func (index *Index) Search(pars *Param) (int, []*Document, error) {
 
 	docs := index.ToDocuments(docIds...)
 	return total, docs, nil
+}
+
+// SearchAll search status index for all result.
+func (index *Index) SearchAll(pars *Param) (int, []*Document, error) {
+	res, err := index.SearchAllDocIds(true)
+	if err != nil {
+		return 0, nil, err
+	}
+
+	res = index.SortDocIds(pars, res)
+	res = index.PageSizeDocIds(res, pars.Offset, pars.Size)
+
+	return len(res), index.ToDocuments(res...), nil
 }
 
 // SearchDocIds ...
@@ -185,13 +199,18 @@ func (index *Index) SearchCategory(category ...string) ([]uint32, error) {
 	return res, nil
 }
 
+// SearchDocIds ...
+func (index *Index) SearchAllDocIds(status bool) ([]uint32, error) {
+	return index.status.Uints(status), nil
+}
+
 // ToDocuments ...
 func (index *Index) ToDocuments(docIds ...uint32) []*Document {
 	res := make([]*Document, 0, len(docIds))
 	for _, docId := range docIds {
 		byts, exists, err := index.documents.SearchUIntBytes(docId)
 		if !exists || err != nil {
-			logger.Warn(err)
+			logger.Warnf("no document or error: %d, %v.", docId, err)
 		}
 		d := new(Document)
 		msgpack.Unmarshal(byts, d)

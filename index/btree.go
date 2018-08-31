@@ -163,7 +163,7 @@ func (t *BTree) Keys(btname []byte, len int) [][]byte {
 
 				return nil
 			} else {
-				return fmt.Errorf("exceed len.")
+				return fmt.Errorf("exceed len")
 			}
 		})
 		return nil
