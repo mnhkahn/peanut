@@ -179,12 +179,17 @@ func TestIndex_SortDocIds(t *testing.T) {
 		Category: "golang",
 	})
 	assert.Nil(t, err)
+	resPks := toPks(res)
+	assert.Equal(t, []string{"3", "2", "1"}, resPks)
+	assert.Equal(t, 3, cnt)
+}
+
+func toPks(res []*Document) []string {
 	resPks := []string{}
 	for _, rrr := range res {
 		resPks = append(resPks, rrr.PK)
 	}
-	assert.Equal(t, []string{"3", "2", "1"}, resPks)
-	assert.Equal(t, 3, cnt)
+	return resPks
 }
 
 func TestIndex_PageSize(t *testing.T) {
@@ -266,4 +271,51 @@ func TestAddTwoTimes(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(res))
 	assert.Equal(t, 1, cnt)
+}
+
+func TestSort(t *testing.T) {
+	index, err := NewIndex("/tmp/a.db")
+	defer index.Close()
+	assert.Nil(t, err)
+
+	err = index.ClearAll()
+	assert.Nil(t, err)
+
+	err = index.AddDocument(&Document{
+		PK:      "a",
+		Title:   "Golang——json数据处理",
+		PubDate: 1,
+		PV:      3,
+	})
+	assert.Nil(t, err)
+	err = index.AddDocument(&Document{
+		PK:      "b",
+		Title:   "Golang——json数据处理",
+		PubDate: 1,
+		PV:      1,
+	})
+	assert.Nil(t, err)
+	err = index.AddDocument(&Document{
+		PK:      "c",
+		Title:   "Golang——json数据处理",
+		PubDate: 3,
+		PV:      2,
+	})
+	assert.Nil(t, err)
+
+	cnt, res, err := index.SearchAll(&Param{Offset: 0, Size: 10, Sort: Sorter{"PubDate", DESC}})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(res))
+	assert.Equal(t, 3, cnt)
+
+	pks := toPks(res)
+	assert.Equal(t, []string{"c", "a", "b"}, pks)
+
+	cnt, res, err = index.SearchAll(&Param{Offset: 0, Size: 10, Sort: Sorter{"PubDate", ASC}})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(res))
+	assert.Equal(t, 3, cnt)
+
+	pks = toPks(res)
+	assert.Equal(t, []string{"b", "a", "c"}, pks)
 }

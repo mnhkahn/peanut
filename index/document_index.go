@@ -9,6 +9,12 @@ type Param struct {
 
 	Offset int
 	Size   int
+	Sort   Sorter
+}
+
+type Sorter struct {
+	Field string
+	Asc   bool
 }
 
 // Document ...
@@ -23,4 +29,5 @@ type Document struct {
 	Category string   `json:"category"`
 	Link     string   `json:"link"`
 	Figure   string   `json:"figure"`
+	PV       int      `json:"pv"`
 }
